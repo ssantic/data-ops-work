@@ -1,6 +1,6 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 
 
 COVID_19_API_URL="https://covid19.mathdro.id/api"
