@@ -1,12 +1,6 @@
-import requests
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-import pandas as pd
-from datetime import datetime, timedelta, date
-from airflow.models import Variable
-import os
-from io import StringIO # python3; python2: BytesIO 
-import boto3
+from datetime import timedelta, date
 
 
 COVID_19_API_URL="https://covid19.mathdro.id/api"
@@ -24,6 +18,8 @@ default_args = {
 
 
 def aws_configure():
+    from airflow.models import Variable
+    import os
     aws_auth = Variable.get("aws_authorization", deserialize_json=True)
     os.environ["AWS_ACCESS_KEY_ID"] = aws_auth["AWS_ACCESS_KEY_ID"]
     os.environ["AWS_SECRET_ACCESS_KEY"] = aws_auth["AWS_SECRET_ACCESS_KEY"]
@@ -31,6 +27,8 @@ def aws_configure():
 
 
 def upload_csv_to_s3(df):
+    import boto3
+    from io import StringIO # python3; python2: BytesIO 
     aws_configure()
     csv_buffer = StringIO()
     df.to_csv(csv_buffer)
@@ -41,6 +39,7 @@ def upload_csv_to_s3(df):
 
 
 def hit_covid_api():
+    import requests
     confirmed_cases_response = requests.get(f"{COVID_19_API_URL}/confirmed")
     if (confirmed_cases_response.status_code == 200):
         return confirmed_cases_response.json()
@@ -49,6 +48,7 @@ def hit_covid_api():
 
 
 def fetch_nd_store_data_to_s3(**context: dict):
+    import pandas as pd
     confirmed_cases_json = hit_covid_api()
     if confirmed_cases_json:
         confirmed_cases_df = pd.DataFrame.from_dict(confirmed_cases_json)
