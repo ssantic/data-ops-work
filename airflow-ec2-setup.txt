@@ -1,0 +1,250 @@
+
+
+
+Assignment Doc
+https://docs.google.com/document/d/e/2PACX-1vROrMMnQEYjRZqGnZnzzkY3b43vCdrtwc4_DMyRpMJr5UbTst4OmP8AhqbcaQjsr734G745-Qro6Tp7/pub?urp=gmail_link
+
+
+
+AWS REGION: eu-central-1
+https://eu-central-1.console.aws.amazon.com/ec2/v2/home?region=eu-central-1#Home:
+
+
+Connect to instance
+open command prompt
+
+ssh -i "airflow_europe_region.pem" ubuntu@35.159.32.72
+
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Setup Docker on EC2 Starts
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+https://docs.docker.com/engine/install/ubuntu/
+
+1.
+sudo apt-get update
+sudo apt-get install \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+Type Y for Yes
+
+2.
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+3.
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+4.
+sudo apt-get update
+
+5.
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+Type Y for Yes
+
+6. Test run docker hello-world
+sudo docker run hello-world
+
+
+https://docs.docker.com/engine/install/linux-postinstall/
+(Run docker without sudo command)
+
+7.
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+docker run hello-world
+
+8.
+Install Docker-Compose also.
+sudo apt install docker-compose
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Setup Docker on EC2 Ends
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Setup Airflow on EC2 Starts
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.3.0/docker-compose.yaml'
+
+
+mkdir -p ./dags ./logs ./plugins
+echo -e "AIRFLOW_UID=$(id -u)" > .env
+AIRFLOW_UID=50000
+docker-compose up airflow-init
+docker-compose up
+
+
+ENDPOINT_URL="http://localhost:8080/"
+curl -X GET  \
+    --user "airflow:airflow" \
+    "${ENDPOINT_URL}/api/v1/pools"
+
+
+
+Add Inbound rule of http and tcp 8080 in EC2 security group.
+
+
+
+ENDPOINT_URL="http://3.72.19.169:8080/"
+curl -X GET  \
+    --user "airflow:airflow" \
+    "${ENDPOINT_URL}/api/v1/pools"
+
+
+To stop airflow and delete all containers
+docker-compose down --volumes --rmi all
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Setup Airflow on EC2 Ends
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+To connect to EC2 instance, 
+
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+Before Stopping EC2.
+Execute : 
+docker-compose down --volumes --rmi all
+
+After starting EC2
+Execute : 
+docker-compose up airflow-init
+docker-compose up
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Go to the pem file airflow_europe_region.pem
+0. cd C:\Users\Neera\OneDrive\Desktop\srdjan_serbia_work\airflow_assignment
+
+Public IP: 18.185.148.55, (It will change on stop and start of EC2 instance)
+
+if you are on ubuntu, open terminal and: 
+1. chmod 400 airflow_europe_region.pem
+2. ssh -i "airflow_europe_region.pem" ubuntu@18.185.148.55
+
+
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+
+Add Steps to create Airflow Variable 
+key: aws_authorization
+value:
+{
+    "AWS_ACCESS_KEY_ID":"AKIAUE3MLU2IS4N3I763",
+    "AWS_SECRET_ACCESS_KEY":"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",
+    "AWS_DEFAULT_REGION":"eu-central-1"
+}
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Download dag file from S3 to EC2.
+Prerequisite: Install AWS CLI if not exists.
+
+export AWS_ACCESS_KEY_ID=AKIAUE3MLU2IS4N3I763
+export AWS_SECRET_ACCESS_KEY=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
+export AWS_DEFAULT_REGION=eu-central-1
+
+aws s3 cp s3://covid-19-mathdroid/covid_19_data_store.py ~/dags/
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+
+
+
+API DETAILS
+https://github.com/mathdroid/covid-19-api
+https://covid19.mathdro.id/api/countries
+
+
+
+Global Cases per day.
+1. Bulk Insert - From First date for data till today's date
+
+Schedule this, so that we can get daily data.
+2. Daily Insert - /
+
+
+
+
+/daily/ 
+22 January 2020
+till today's date 
+
+
+
+Hit the api 198 times daily,
+We can update our database according to that.
+
+CSVs (json to csv)
+
+S3/covid-19/counrty_name/date/data.csv
+
+
+final_ouput
+S3/covid-19/date/confirmed_cases.csv
+S3/covid-19/date/confirmed_cases.csv
+S3/covid-19/date/confirmed_cases.csv
+
+
+
+
+
+Read the daily_data .
+Inside database Mysql, Postgresql --> update data from the latest csv.
+
+_______________
+MARK DOWN FILE
+OnDemand Airflow Setup | AWS MWAA | GCP CloudComposer | Astronomer 
+--------------
+
+Kubernetes 
+pods 
+airflow-webserver
+airflow-scheduler
+airflow-worker-
+..
+
+ 
+=-=-=-=-=-=-=-=-=
+
+Container specific for airflow-scheduler 
+= shell script (24 * 7), 
+= kubectl 
+= 
+
+data.csv --> data_1.csv
+data_2.csv
+
+data_1.csv + data_2.csv = data.csv
+data.csv
+=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+Add Steps to create Airflow Variable
+{
+    "AWS_ACCESS_KEY_ID":"AKIAUE3MLU2IS4N3I763",
+    "AWS_SECRET_ACCESS_KEY":"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",
+    "AWS_DEFAULT_REGION":"eu-central-1"
+}
+
+
+export AWS_ACCESS_KEY_ID=AKIAUE3MLU2IS4N3I763
+export AWS_SECRET_ACCESS_KEY=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
+export AWS_DEFAULT_REGION=eu-central-1
+
+
+
+
+1. https://covid19.mathdro.id/api/countries
+2. https://covid19.mathdro.id/api/daily
+3. https://covid19.mathdro.id/api/confirmed
+
+JSON format --> csv format (local file save) using python
+load local csv to mysql using python 
+
+Important links --> Adding requirements in docker compose.
+https://stackoverflow.com/questions/67851351/cannot-install-additional-requirements-to-apache-airflow
