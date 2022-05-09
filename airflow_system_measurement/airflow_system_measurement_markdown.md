@@ -77,7 +77,4 @@
         Avoid triggering DAGs immediately after changing them or any other accompanying files that you change in the DAG folder.
         You should give the system sufficient time to process the changed files
 
-    <p align="right">(<a href="#top">back to top</a>)</p>
-    <div id="reducing_DAG_complexity"></div>
 
-    * ###### Reducing DAG complexity 
