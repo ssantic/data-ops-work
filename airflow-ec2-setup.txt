@@ -137,8 +137,8 @@ Add Steps to create Airflow Variable
 key: aws_authorization
 value:
 {
-    "AWS_ACCESS_KEY_ID":"AKIAUE3MLU2IS4N3I763",
-    "AWS_SECRET_ACCESS_KEY":"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",
+    "AWS_ACCESS_KEY_ID":"############",
+    "AWS_SECRET_ACCESS_KEY":"##########",
     "AWS_DEFAULT_REGION":"eu-central-1"
 }
 
@@ -146,105 +146,11 @@ value:
 Download dag file from S3 to EC2.
 Prerequisite: Install AWS CLI if not exists.
 
-export AWS_ACCESS_KEY_ID=AKIAUE3MLU2IS4N3I763
-export AWS_SECRET_ACCESS_KEY=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
+export AWS_ACCESS_KEY_ID=############
+export AWS_SECRET_ACCESS_KEY=###########
 export AWS_DEFAULT_REGION=eu-central-1
 
 aws s3 cp s3://covid-19-mathdroid/covid_19_data_store.py ~/dags/
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
-
-
-API DETAILS
-https://github.com/mathdroid/covid-19-api
-https://covid19.mathdro.id/api/countries
-
-
-
-Global Cases per day.
-1. Bulk Insert - From First date for data till today's date
-
-Schedule this, so that we can get daily data.
-2. Daily Insert - /
-
-
-
-
-/daily/ 
-22 January 2020
-till today's date 
-
-
-
-Hit the api 198 times daily,
-We can update our database according to that.
-
-CSVs (json to csv)
-
-S3/covid-19/counrty_name/date/data.csv
-
-
-final_ouput
-S3/covid-19/date/confirmed_cases.csv
-S3/covid-19/date/confirmed_cases.csv
-S3/covid-19/date/confirmed_cases.csv
-
-
-
-
-
-Read the daily_data .
-Inside database Mysql, Postgresql --> update data from the latest csv.
-
-_______________
-MARK DOWN FILE
-OnDemand Airflow Setup | AWS MWAA | GCP CloudComposer | Astronomer 
---------------
-
-Kubernetes 
-pods 
-airflow-webserver
-airflow-scheduler
-airflow-worker-
-..
-
- 
-=-=-=-=-=-=-=-=-=
-
-Container specific for airflow-scheduler 
-= shell script (24 * 7), 
-= kubectl 
-= 
-
-data.csv --> data_1.csv
-data_2.csv
-
-data_1.csv + data_2.csv = data.csv
-data.csv
-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-Add Steps to create Airflow Variable
-{
-    "AWS_ACCESS_KEY_ID":"AKIAUE3MLU2IS4N3I763",
-    "AWS_SECRET_ACCESS_KEY":"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",
-    "AWS_DEFAULT_REGION":"eu-central-1"
-}
-
-
-export AWS_ACCESS_KEY_ID=AKIAUE3MLU2IS4N3I763
-export AWS_SECRET_ACCESS_KEY=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
-export AWS_DEFAULT_REGION=eu-central-1
-
-
-
-
-1. https://covid19.mathdro.id/api/countries
-2. https://covid19.mathdro.id/api/daily
-3. https://covid19.mathdro.id/api/confirmed
-
-JSON format --> csv format (local file save) using python
-load local csv to mysql using python 
-
-Important links --> Adding requirements in docker compose.
-https://stackoverflow.com/questions/67851351/cannot-install-additional-requirements-to-apache-airflow
